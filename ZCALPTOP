@@ -1,0 +1,66 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZCALPTOP
+*&---------------------------------------------------------------------*
+
+TABLES: Zpay, zdaemp.
+
+DATA: pcpf TYPE ZPAY-CPFNO,
+      Pnam TYPE ZPAY-NAME,
+      Ppos TYPE ZPAY-emp_pos,
+      ppayr TYPE ZPAY-payrate,
+      ppan TYPE ZPAY-pan,
+      pdob TYPE ZPAY-dob,
+      pdoj TYPE ZPAY-doj,
+      pdolp TYPE ZPAY-dolp,
+      pbkacc TYPE ZPAY-bankacc,
+
+      opos TYPE ZPos-emp_pos,
+      odes TYPE ZPos-designation,
+      oplow TYPE ZPos-payscale_low,
+      ophi TYPE ZPos-payscale_high,
+
+      amon type zdaemp-mon.
+
+DATA: p_pr TYPE zpay-payrate,
+      p_per TYPE zdaemp-per,
+      p_da TYPE p DECIMALS 2,
+      p_hra TYPE p DECIMALS 2,
+      p_cmre TYPE p DECIMALS 2,
+      p_spe TYPE p DECIMALS 2,
+      p_nps TYPE p DECIMALS 2,
+      p_cpf TYPE p DECIMALS 2,
+      p_it TYPE p DECIMALS 2,
+      p_net TYPE p DECIMALS 2,
+      p_loan TYPE p DECIMALS 2.
+
+TYPES:BEGIN OF ty_pr,
+      cpfNO TYPE ZPAY-CPFNO,
+      NAME TYPE ZPAY-NAME,
+      EMP_POS TYPE ZPAY-emp_pos,
+      PAYRATE TYPE ZPAY-payrate,
+      PAN TYPE ZPAY-pan,
+      DOB TYPE ZPAY-dob,
+      DOJ TYPE ZPAY-doj,
+      DOLP TYPE ZPAY-dolp,
+      BANKACC TYPE ZPAY-bankacc,
+
+      DESIG TYPE ZPos-designation,
+      LOW TYPE ZPos-payscale_low,
+      HIGH TYPE ZPos-payscale_high,
+
+      per type zdaemp-per,
+      MON TYPE ZDAEMP-MON,
+      HRA TYPE p DECIMALS 2,
+      DA TYPE p DECIMALS 2,
+      cmre TYPE p DECIMALS 2,
+      spe TYPE p DECIMALS 2,
+      nps TYPE p DECIMALS 2,
+      cpf TYPE p DECIMALS 2,
+      it TYPE p DECIMALS 2,
+      net TYPE p DECIMALS 2,
+      loan TYPE p DECIMALS 2,
+
+  END OF ty_pr.
+
+  DATA: pt_pays TYPE TABLE OF ty_pr,
+        ps_pay TYPE ty_pr.

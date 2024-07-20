@@ -1,0 +1,29 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZAUTOF01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  CAL_PAYR
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_PS_PAY_EMP_POS  text
+*      -->P_PS_PAY_DOLP  text
+*      -->P_PS_PAY_LOW  text
+*      <--P_PS_PAY_PAYRATE  text
+*----------------------------------------------------------------------*
+MODULE DATA_FETCH OUTPUT.
+   SELECT * FROM Zpay into corresponding fields of table pt_pays.
+ENDMODULE.
+
+FORM CAL_PAYR  USING    emp_pos
+                        P_DOLP
+               CHANGING P_RATE.
+
+      DATA: p_yr type i,
+            p_low type zpos-payscale_low.
+      select single payscale_low into p_low from zpos where emp_pos = emp_pos.
+
+      p_yr = ( sy-datum - p_dolp ) / 365.
+      p_rate = p_low + ( 3  * p_yr * p_low ) / 100 .
+
+ENDFORM.

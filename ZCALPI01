@@ -1,0 +1,56 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZCALPI01
+*&---------------------------------------------------------------------*
+MODULE USER_COMMAND_0100 INPUT.
+
+CASE sy-ucomm.
+  WHEN 'SAVE'.
+
+  WHEN 'DISPLAY'.
+
+    ps_pay-CPFNO = pcpf.
+    ps_pay-MON = Amon.
+
+BREAK-POINT.
+
+    PERFORM cal_da using ps_pay-cpfno ps_pay-mon changing ps_pay-da.
+    PERFORM cal_hra using ps_pay-cpfno  changing ps_pay-hra.
+    PERFORM cal_cmre using ps_pay-cpfno  changing ps_pay-cmre.
+    PERFORM cal_spe  changing ps_pay-spe.
+    PERFORM cal_nps changing ps_pay-nps.
+    PERFORM cal_cpf using ps_pay-cpfno  changing ps_pay-cpf.
+    PERFORM cal_it using ps_pay-cpfno  changing ps_pay-it.
+    PERFORM cal_loan  changing ps_pay-loan.
+    PERFORM cal_net using ps_pay-cpfno  changing ps_pay-net.
+
+    CLEAR : pcpf, amon.
+*    SELECT * FROM ZpAY into corresponding fields of table pt_pays where cpfno = pcpf.
+*    PERFORM loopy.
+   PERFORM DISPLAY_PDF.
+
+  WHEN 'EXIT'.
+    LEAVE PROGRAM.
+
+  WHEN 'BACK'.
+    CALL SCREEN 0.
+
+ENDCASE.
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+
+MODULE USER_COMMAND_0200 INPUT.
+
+
+CASE sy-ucomm.
+
+  WHEN 'EXIT'.
+    LEAVE PROGRAM.
+
+  WHEN 'BACK'.
+    CALL SCREEN 100.
+ENDCASE.
+
+ENDMODULE.

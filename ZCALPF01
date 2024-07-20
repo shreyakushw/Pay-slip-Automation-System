@@ -1,0 +1,210 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZCALPF01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  CAL_DA
+*&---------------------------------------------------------------------*
+
+FORM CAL_DA  USING    pcpf
+                      amon
+             CHANGING p_da.
+  SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+  SELECT SINGLE per INTO p_per FROM zdaemp WHERE mon = amon.
+  p_da = ( p_per * p_pr ) / 100.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  LOOPY
+*&---------------------------------------------------------------------*
+
+FORM LOOPY .
+  LOOP AT pt_pays INTO ps_pay.
+    ps_pay-payrate = p_pr.
+    ps_pay-da = p_da. " Assuming there's a field for DA in zpay
+    MODIFY pt_pays FROM ps_pay.
+  ENDLOOP.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_HRA
+*&---------------------------------------------------------------------*
+
+FORM CAL_HRA  USING    PCPF
+              CHANGING P_HRA.
+    SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+    p_hra = p_pr * ( 27 / 100 ).
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_CMRE
+*&---------------------------------------------------------------------*
+
+FORM CAL_CMRE  USING    PCPF
+               CHANGING P_CMRE.
+    SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+    p_cmre = p_pr * ( 5 / 100 ).
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_SPE
+*&---------------------------------------------------------------------*
+
+FORM CAL_SPE  CHANGING P_SPE.
+    p_spe = 10000.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_NPS
+*&---------------------------------------------------------------------*
+
+FORM CAL_NPS  CHANGING P_nps.
+    P_nps = 16500.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_CPF
+*&---------------------------------------------------------------------*
+FORM CAL_CPF  USING    PCPF
+              CHANGING P_CPF.
+     SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+     p_cpf = p_pr * ( 12 / 100 ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_IT
+*&---------------------------------------------------------------------*
+FORM CAL_IT  USING    Pcpf
+             CHANGING P_it.
+      SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+     p_it = p_pr * ( 30 / 100 ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_LOAN
+*&---------------------------------------------------------------------*
+
+FORM CAL_LOAN CHANGING P_LOAN.
+      p_loan = 5000.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CAL_NET
+*&---------------------------------------------------------------------*
+
+FORM CAL_NET  USING    Pcpf
+              CHANGING P_NET.
+        SELECT SINGLE payrate INTO p_pr FROM zpay WHERE cpfno = pcpf.
+     p_net = p_pr + ps_pay-hra + ps_pay-da + ps_pay-cmre + ps_pay-spe - ps_pay-nps - ps_pay-cpf - ps_pay-it - ps_pay-loan.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_PDF
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM DISPLAY_PDF .
+    data : fp_outputparams type sfpoutputparams,
+         w_doc_param     type sfpdocparams, "Doc Parameters
+         fm_name         type rs38l_fnam.
+  data : fp_formoutput type fpformoutput.
+  data : fp_docuparams type sfpdocparams.
+
+
+  try.
+**To get the generated function module
+      call function 'FP_FUNCTION_MODULE_NAME'           "#EC ARGCHECKED
+        exporting
+          i_name     = 'ZHR_PAYROLL_PDF'
+        importing
+          e_funcname = fm_name.
+    catch cx_fp_api_repository.
+    catch cx_fp_api_usage.
+    catch cx_fp_api_internal.
+  endtry.
+
+  fp_outputparams-nodialog = ''.
+  fp_outputparams-preview  = ''.    " launch print preview
+  fp_outputparams-getpdf = ''.
+  fp_outputparams-connection = 'ADS'."gc_connection.
+  sy-cprog = 'X'.                                         "#EC WRITE_OK
+  fp_outputparams-dest = 'hp01'.
+  call function 'FP_JOB_OPEN'
+    changing
+      ie_outputparams = fp_outputparams
+    exceptions
+      cancel          = 1
+      usage_error     = 2
+      system_error    = 3
+      internal_error  = 4
+      others          = 5.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno
+            with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.
+
+  fp_docuparams-langu = 'E'.
+  fp_docuparams-country = 'US'.
+  fp_docuparams-fillable = 'X'.
+  fp_docuparams-dynamic = 'X'.
+
+
+  call function fm_name
+    exporting
+      /1bcdwb/docparams      = fp_docuparams
+      ist_ZFI_LC_PAYMENT_pdf = ist_ZFI_LC_PAYMENT_pdf
+      head1                  = head1
+      amount1                = amount1
+      letter1                = letter1
+      amount_rep             = amount_rep
+      pmt4                   = pmt4
+      date22                 = date22
+      name22                 = name22
+      desig22                = desig22
+      ven_tot                = ven_tot
+      ist_zfi_swift          = ist_zfi_swift
+      acc2                   = acc2
+      rout2                  = rout2
+      swift2                 = swift2
+      bankname1              = bankname1
+      add1                   = add1
+      add2                   = add2
+      lrs8                   = lrs8
+      name11                 = name11
+      desig11                = desig11
+      purpose8               = purpose8
+      codedesc8              = codedesc8
+      declaration            = declaration
+      bankname5              = bankname5
+      add5                   = add5
+      add5_2                 = add5_2
+      rem2                   = rem2
+      acc5                   = acc5
+*     swaift5                = swift5
+      swift5                 = swift5
+      rout5                  = rout5
+      Value_dd               = Value_dd
+      Value_mm               = Value_mm
+      Value_yy               = Value_yy
+      amount5                = amount5
+      curr2                  = curr2
+      amount2                = amount2
+    importing
+      /1bcdwb/formoutput     = fp_formoutput
+    exceptions
+      usage_error            = 1
+      system_error           = 2
+      internal_error         = 3
+      others                 = 4.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno
+            with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.
+  call function 'FP_JOB_CLOSE'
+* IMPORTING
+*   E_RESULT             =
+    exceptions
+      usage_error    = 1
+      system_error   = 2
+      internal_error = 3
+      others         = 4.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno
+            with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.                  " DISPLAY_FORM
+
+ENDFORM.

@@ -1,0 +1,89 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZAUTOI01
+*&---------------------------------------------------------------------*
+
+MODULE USER_COMMAND_0100 INPUT.
+CASE sy-ucomm.
+  WHEN 'SAVE'.
+
+
+
+    ps_pay-CPFNO = pcpf.
+    ps_pay-NAME    = pnam.
+    ps_pay-EMP_POS = ppos.
+    ps_pay-PAN     = ppan.
+
+    ps_pay-DOB   = pdob.
+    ps_pay-DOJ   = pdoj.
+    ps_pay-DOLP  = pdolp.
+    ps_pay-BANKACC = pbkacc.
+    PERFORM cal_payr using ps_pay-emp_pos ps_pay-dolp changing ps_pay-payrate.
+
+    DATA :  lt_pays TYPE TABLE OF zpay,
+            lS_pay  TYPE zpay.
+
+    MOVE-CORRESPONDING ps_pay to ls_pay.
+
+    APPEND ls_pay to lt_payS.
+    Insert zpay from table lt_pays.
+
+    APPEND ps_pay to pt_pays.
+    MESSAGE 'Data saved successfully' TYPE 'I'.
+    CLEAR : pcpf, pnam, ppos, ppan, pdob, pdoj, pdolp, pbkacc.
+
+  WHEN 'DISPLAY'.
+*   SELECT CPFNO NAME EMP_POS PAYRATE PAN DOB DOJ DOLP BANKACC DESIGNATION PAYSCALE_LOW PAYSCALE_HIGH FROM Zpay JOIN ZPOS ON ZPAY-EMP_POS = ZPOS-EMP_POS into corresponding fields of table pt_pays.
+*     SELECT designation
+    SELECT zpay~cpfno,
+       zpay~name,
+       zpay~emp_pos,
+       zpay~payrate,
+       zpay~pan,
+       zpay~dob,
+       zpay~doj,
+       zpay~dolp,
+       zpay~bankacc,
+       zpos~designation,
+       zpos~payscale_low,
+       zpos~payscale_high
+  INTO CORRESPONDING FIELDS OF TABLE @pt_pays
+  FROM zpay
+  INNER JOIN zpos ON zpay~emp_pos = zpos~emp_pos.
+
+
+
+*  SELECT * FROM ZpAY into corresponding fields of table pt_pays.
+*      payscale_low
+*      payscale_high FROM Zpos into corresponding fields of table pt_pays.
+
+     CALL SCREEN 200.
+
+
+  WHEN 'EXIT'.
+
+    LEAVE PROGRAM.
+
+
+  WHEN 'BACK'.
+
+    CALL SCREEN 0.
+ENDCASE.
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0200 INPUT.
+
+CASE sy-ucomm.
+
+  WHEN 'EXIT'.
+    LEAVE PROGRAM.
+
+  WHEN 'BACK'.
+    CALL SCREEN 100.
+ENDCASE.
+
+ENDMODULE.

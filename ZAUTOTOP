@@ -1,0 +1,42 @@
+*&---------------------------------------------------------------------*
+*& Include ZAUTOTOP                                          Module Pool      ZAUTO
+*&
+*&---------------------------------------------------------------------*
+PROGRAM ZAUTO.
+
+TABLES: Zpay,Zpos.
+
+DATA: pcpf TYPE ZPAY-CPFNO,
+      Pnam TYPE ZPAY-NAME,
+      Ppos TYPE ZPAY-emp_pos,
+      ppayr TYPE ZPAY-payrate,
+      ppan TYPE ZPAY-pan,
+      pdob TYPE ZPAY-dob,
+      pdoj TYPE ZPAY-doj,
+      pdolp TYPE ZPAY-dolp,
+      pbkacc TYPE ZPAY-bankacc,
+
+      opos TYPE ZPos-emp_pos,
+      odes TYPE ZPos-designation,
+      oplow TYPE ZPos-payscale_low,
+      ophi TYPE ZPos-payscale_high.
+
+TYPES:BEGIN OF ty_pr,
+      cpfNO TYPE ZPAY-CPFNO,
+      NAME TYPE ZPAY-NAME,
+      EMP_POS TYPE ZPAY-emp_pos,
+      PAYRATE TYPE ZPAY-payrate,
+      PAN TYPE ZPAY-pan,
+      DOB TYPE ZPAY-dob,
+      DOJ TYPE ZPAY-doj,
+      DOLP TYPE ZPAY-dolp,
+      BANKACC TYPE ZPAY-bankacc,
+
+
+      DESIGNATION TYPE ZPos-designation,
+      PAYSCALE_LOW TYPE ZPos-payscale_low,
+      PAYSCALE_HIGH TYPE ZPos-payscale_high,
+  END OF ty_pr.
+
+  DATA: pt_pays TYPE TABLE OF ty_pr,
+        ps_pay TYPE ty_pr.
